@@ -1,0 +1,25 @@
+ulk
+===
+
+:= untypisiertes-lambda-kalkuel (untyped lambda calculus)
+
+Only lex and parse is implemented right now.
+
+Run
+---
+
+Install
+
+    cargo install --path .
+
+Use as follows:  
+
+    ulk examples/true.ulk
+
+Resulting in
+
+    l:
+     x
+     l:
+      y
+      x
