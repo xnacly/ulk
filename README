@@ -14,7 +14,7 @@ Install
 
 Use as follows:  
 
-    ulk examples/true.ulk
+    ulk --ast examples/true.ulk
 
 Resulting in
 

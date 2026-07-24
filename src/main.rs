@@ -1,4 +1,6 @@
-use std::{env::args, fs};
+use std::fs;
+
+use clap::Parser;
 
 mod lex;
 mod parse;
@@ -15,18 +17,28 @@ impl<'ulk> Ulk<'ulk> {
     }
 }
 
+#[derive(clap::Parser)]
+struct Options {
+    /// Print ast
+    #[clap(long, short)]
+    ast: bool,
+
+    filename: String,
+}
+
 fn main() {
-    let filename = args()
-        .last()
-        .expect("No filename provided, last arg must be filename");
-    assert!(filename.ends_with(".ulk"));
-    let filebody = fs::read(filename).expect("Failed to read file");
+    let opts = Options::parse();
+    assert!(opts.filename.ends_with(".ulk"));
+    let filebody = fs::read(opts.filename).expect("Failed to read file");
     let u = Ulk::new(&filebody);
-    println!(
-        "{}",
-        u.parser
-            .map(|n| n.to_string())
-            .reduce(|acum, s| acum + &s)
-            .unwrap_or_default()
-    )
+
+    if opts.ast {
+        println!(
+            "{}",
+            u.parser
+                .map(|n| n.to_string())
+                .reduce(|acum, s| acum + &s)
+                .unwrap_or_default()
+        )
+    }
 }
