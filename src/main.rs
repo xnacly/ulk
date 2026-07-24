@@ -19,5 +19,7 @@ fn main() {
     let opts = Options::parse();
     assert!(opts.filename.ends_with(".ulk"));
     let filebody = fs::read(&opts.filename).expect("Failed to read file");
-    ulk::Ulk::new(&opts, &filebody).eval();
+    ulk::Ulk::new(&opts, &filebody)
+        .eval()
+        .expect("Failed to eval");
 }

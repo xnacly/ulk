@@ -70,7 +70,7 @@ impl<'l> Iterator for Lex<'l> {
                 self.bump();
                 Some(Token::Dot)
             }
-            b'a'..b'z' | b'A'..b'Z' => Some(Token::Binding(
+            b'a'..=b'z' | b'A'..=b'Z' => Some(Token::Binding(
                 self.take_while(|cur| cur.is_ascii_alphabetic()),
             )),
             _ => None,
@@ -102,8 +102,13 @@ mod test {
     #[test]
     fn tokenizes_bindings() {
         assert_lexes(
-            "foo Bar",
-            vec![Token::Binding(b"foo"), Token::Binding(b"Bar")],
+            "foo Bar z Z",
+            vec![
+                Token::Binding(b"foo"),
+                Token::Binding(b"Bar"),
+                Token::Binding(b"z"),
+                Token::Binding(b"Z"),
+            ],
         );
     }
 

@@ -10,7 +10,7 @@ pub struct Parser<'parse> {
 #[derive(Debug, PartialEq)]
 pub enum Node<'node> {
     Binding(&'node str),
-    Lambda((Box<Node<'node>>, Box<Node<'node>>)),
+    Lambda((&'node str, Box<Node<'node>>)),
 }
 
 impl<'parse> Parser<'parse> {
@@ -31,7 +31,7 @@ impl<'parse> Parser<'parse> {
                 let lex::Token::Binding(txt) = self.cur else {
                     panic!("Lambda calc mandates lx.x, missing function argument");
                 };
-                let argument = Box::new(Node::Binding(unsafe { str::from_utf8_unchecked(&txt) }));
+                let argument = unsafe { str::from_utf8_unchecked(&txt) };
 
                 self.advance();
                 let lex::Token::Dot = self.cur else {
@@ -74,7 +74,7 @@ impl Node<'_> {
             Node::Binding(binding) => write!(f, "{binding}"),
             Node::Lambda((arg, body)) => {
                 writeln!(f, "l:")?;
-                arg.fmt_with_indent(f, indent + 1)?;
+                write!(f, "{}{}", " ".repeat(indent + 1), arg)?;
                 writeln!(f)?;
                 body.fmt_with_indent(f, indent + 1)
             }
@@ -95,7 +95,7 @@ mod test {
         assert_eq!(
             parse(b"lx.x"),
             vec![Node::Lambda((
-                Box::new(Node::Binding("x")),
+                "x",
                 Box::new(Node::Binding("x"))
             ))]
         );
@@ -106,9 +106,9 @@ mod test {
         assert_eq!(
             parse(b"lx.ly.y"),
             vec![Node::Lambda((
-                Box::new(Node::Binding("x")),
+                "x",
                 Box::new(Node::Lambda((
-                    Box::new(Node::Binding("y")),
+                    "y",
                     Box::new(Node::Binding("y")),
                 ))),
             ))]
@@ -133,7 +133,7 @@ mod test {
         assert_eq!(
             parse(b"# identity\nlx.x\n# done"),
             vec![Node::Lambda((
-                Box::new(Node::Binding("x")),
+                "x",
                 Box::new(Node::Binding("x"))
             ))]
         );
